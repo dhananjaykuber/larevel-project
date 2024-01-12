@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Profile\AvatarController;
 use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\DB;
+use Laravel\Socialite\Facades\Socialite;
 
 
 /*
@@ -29,6 +31,25 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::patch('/profile/avatar', [AvatarController::class, 'update'])->name('profile.avatar');
+    Route::patch('/profile/avatar/ai', [AvatarController::class, 'generate'])->name('profile.avatar.ai');
+});
+
+Route::post('/auth/redirect', function () {
+    return Socialite::driver('github')->redirect();
+})->name('login.github');
+ 
+Route::get('/auth/callback', function () {
+    $user = Socialite::driver('github')->user();
+
+    $user = User::firstOrCreate(['email' => $user->email], [
+        'name' => $user->name,
+        'password' => 'password'
+    ]);
+
+    Auth::login($user);
+
+    return redirect(route('dashboard'));
 });
 
 require __DIR__.'/auth.php';

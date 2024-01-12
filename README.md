@@ -52,3 +52,48 @@
 
     // dd($users->name);
 ```
+
+## Config cache
+
+-   reading configurations from file all the times is not optimal, so we cache the config and it is stored in bootstrap/cache/config.php
+-   when we change any file in config or env file then we to run the command `php artisan config:cache`
+
+## DB table changes
+
+-   when we wanted to make the changes in table then first we make migrations using `php artisan make:migration update_user_table_add_avatar_field --table=users`, here we provide the name to the migration name and the table name
+-   and after successful migration we make the changes into that migration file
+-   at end we run `php artisan migrate` command to run the migrations
+
+## Laravel Shell
+
+-   `php artisan tinker`
+
+## Mass Assignment
+
+-   in $fillable array of model fields: https://laravel.com/docs/10.x/eloquent#mass-assignment
+
+## Controllers
+
+-   php artisan make:controller Profile/AvatarController
+
+## Redirects
+
+```
+return response()->redirectTo('/profile');
+                    OR
+return response()->redirectTo(route('profile.edit'));
+                    OR
+return back()->with('message', 'Avatar is updated');
+```
+
+## Request Validation
+
+`php artisan make:request UpdateAvatarRequest`
+
+## Current user
+
+-`auth()->user()`
+
+## Link storage with public
+
+-   `php artisan storage:link`
