@@ -97,3 +97,36 @@ return back()->with('message', 'Avatar is updated');
 ## Link storage with public
 
 -   `php artisan storage:link`
+
+# <------------------------------------------------------------------------------------------>
+
+## Help Ticket Project
+
+## Tables
+
+### Tickets & Replies
+
+### Create model
+
+-   `php artisan make:model Ticket -mrR`
+
+## List all available routes
+
+-   `php artisan route:list`
+
+## Create new component
+
+-   `php artisan make:component Textarea`
+
+## Pass props to component
+
+-   In app/View/Components in component controller file declare the attribute/ value we want to pass to component and accept it at the constructor parameter and then assign new coming value to class variable, eg:
+
+```
+    public $value = "";
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+```

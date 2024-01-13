@@ -58,4 +58,13 @@ class User extends Authenticatable
             get: fn($value) => strtoupper($value)
         );
     }
+
+    protected function isAdmin(): Attribute
+    {
+        $admins = ['dnkuber2002@gmail.com'];
+
+        return Attribute::make(
+            get: fn() => in_array($this->email, $admins),
+        );
+    }
 }
