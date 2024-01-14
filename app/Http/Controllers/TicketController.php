@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Ticket;
+use App\Models\Reply;
+use App\Models\User;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Http\Requests\StoreReplyRequest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use App\Notifications\TicketUpdatedNotification;
 
 class TicketController extends Controller
 {
@@ -17,7 +21,7 @@ class TicketController extends Controller
     {
         $user = auth()->user();
 
-        $tickets = Ticket::all();
+        $tickets = $user->isAdmin ? Ticket::latest()->get() : $user->tickets;
 
         return view('ticket.index', compact('tickets'));
     }
@@ -56,7 +60,9 @@ class TicketController extends Controller
      */
     public function show(Ticket $ticket)
     {
-        return view('ticket.show', compact('ticket'));
+        $replies = $ticket->replies;
+
+        return view('ticket.show', compact('ticket', 'replies'));
     }
 
     /**
@@ -72,7 +78,13 @@ class TicketController extends Controller
      */
     public function update(UpdateTicketRequest $request, Ticket $ticket)
     {
-        $ticket->update(['title' => $request->title, 'description' => $request->description]);
+        // except attachment update all
+        $ticket->update($request->except('attachment'));
+
+        if($request->status) {
+            // send email
+            $ticket->user->notify(new TicketUpdatedNotification($ticket));
+        }
 
         if($request->file('attachment')) {
             // delete previous attachment
@@ -83,7 +95,7 @@ class TicketController extends Controller
             $ticket->update(['attachment' => $path]);
         }
 
-        return redirect(route('ticket.index'));
+        return redirect(route('ticket.show', $ticket->id));
     }
 
     /**
@@ -109,5 +121,17 @@ class TicketController extends Controller
         Storage::disk('public')->put($path, $contents);
 
         return $path;
+    }
+
+    // Reply 
+    public function storeReply(StoreReplyRequest $request, Ticket $ticket)
+    {
+        Reply::create([
+            'body' => $request->body,
+            'user_id' => auth()->id(),
+            'ticket_id' => $ticket->id,
+        ]);
+
+        return redirect(route('ticket.show', $ticket->id));
     }
 }

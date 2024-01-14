@@ -17,8 +17,11 @@
                 </div>
             </form>        
         </header>
-    
-        <img src="{{ "/storage/$user->avatar" }}" alt="user avatar" class="rounded-full" width="100px" height="100px"/>
+
+        @if (auth()->user()->avatar)
+            <img src="{{ "/storage/$user->avatar" }}" alt="user avatar" class="rounded-full" width="100px" height="100px"/>
+        @endif
+
     </div>
 
     <strong class="block mb-5" style="margin-top: 20px">OR</strong>
